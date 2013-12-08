@@ -31,9 +31,9 @@ public class DynamicPowerPolicyChangeThread extends Thread {
 	// CPU
 	private final String CMD_SET_CPU_TO_PERFORMANCE_POLICY = "echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor";
 
-	private final String CMD_SET_CPU_TO_FANTASYS_POLICY = "echo fantasys > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor";
+	private final String CMD_SET_CPU_TO_FANTASY_POLICY = "echo fantasy > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor";
 
-	private final String CMD_SET_CPU_TO_BENCHMARK_POLICY = "echo benchmark > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor";
+	//private final String CMD_SET_CPU_TO_BENCHMARK_POLICY = "echo benchmark > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor";
 
 	private Context mContext;
 	private ActivityManager mActivityManager;
@@ -75,13 +75,13 @@ public class DynamicPowerPolicyChangeThread extends Thread {
 				
 				ComponentName componentName = mActivityManager.getRunningTasks(1).get(0).topActivity;
 				String packageName = componentName.getPackageName();
-				boolean isInBenchmarkMode = mFilterAppString.indexOf(packageName) == -1 ? false : true;
+				boolean isInPerformanceMode = mFilterAppString.indexOf(packageName) == -1 ? false : true;
 				boolean isConnected = intent.getExtras().getBoolean("connected");
 			
 				if (isConnected) {
 					//System.out.println("##usb is connected!!!");
 					mIsUsbConnected = true;
-					if (!isInBenchmarkMode) {
+					if (!isInPerformanceMode) {
 									
 						//System.out.println("##usb is connected CMD_SET_CPU_TO_PERFORMANCE_POLICY!!!");
 						setCPUWorkMode(CMD_SET_CPU_TO_PERFORMANCE_POLICY);
@@ -93,8 +93,8 @@ public class DynamicPowerPolicyChangeThread extends Thread {
 					//System.out.println("##usb is disconnected!!!");
 					mIsUsbConnected = false;
 
-					if (!isInBenchmarkMode) {
-						setCPUWorkMode(CMD_SET_CPU_TO_FANTASYS_POLICY);
+					if (!isInPerformanceMode) {
+						setCPUWorkMode(CMD_SET_CPU_TO_FANTASY_POLICY);
 					} else {
 						//System.out.println("##Run in blenmark mode, still in performance policy!");
 					}
@@ -115,22 +115,22 @@ public class DynamicPowerPolicyChangeThread extends Thread {
 			
 			ComponentName componentName = mActivityManager.getRunningTasks(1).get(0).topActivity;
 			String packageName = componentName.getPackageName();
-			boolean isInBenchmarkMode = mFilterAppString.indexOf(packageName) == -1 ? false : true;
+			boolean isInPerformanceMode = mFilterAppString.indexOf(packageName) == -1 ? false : true;
 
-			if (isInBenchmarkMode && !mIsNeedToSetWorkMode) {
+			if (isInPerformanceMode && !mIsNeedToSetWorkMode) {
 
-				setCPUWorkMode(CMD_SET_CPU_TO_BENCHMARK_POLICY);
+				setCPUWorkMode(CMD_SET_CPU_TO_PERFORMANCE_POLICY);
 				mIsNeedToSetWorkMode = true;
 			//	System.out.println("set benchmark policy...........");
 
-			} else if (!isInBenchmarkMode && mIsNeedToSetWorkMode) {
+			} else if (!isInPerformanceMode && mIsNeedToSetWorkMode) {
 
 				mIsNeedToSetWorkMode = false;
 				if (mIsUsbConnected) {
 					setCPUWorkMode(CMD_SET_CPU_TO_PERFORMANCE_POLICY);
 				}else {
 					//System.out.println("##usb is connected CMD_SET_CPU_TO_FANTASYS_POLICY!!!");
-					setCPUWorkMode(CMD_SET_CPU_TO_FANTASYS_POLICY);
+					setCPUWorkMode(CMD_SET_CPU_TO_FANTASY_POLICY);
 				}
 			//	System.out.println("resume cpu policy...........");
 			}
